@@ -636,7 +636,7 @@ class LatentDiffusion(DDPM):
         ddim_steps=200,
         ddim_eta=1.0,
         x_T=None,
-        n_gen=1,
+        n_candidate_gen_per_text=1,
         unconditional_guidance_scale=1.0,
         unconditional_conditioning=None,
         name="waveform",
@@ -644,7 +644,7 @@ class LatentDiffusion(DDPM):
         save=False,
         **kwargs,
     ):
-        # Generate n_gen times and select the best
+        # Generate n_candidate_gen_per_text times and select the best
         # Batch: audio, text, fnames
         assert x_T is None
         try:
@@ -672,16 +672,14 @@ class LatentDiffusion(DDPM):
                 text = super().get_input(batch, "text")
 
                 # Generate multiple samples
-                batch_size = z.shape[0] * n_gen
-                c = torch.cat([c] * n_gen, dim=0)
-                text = text * n_gen
+                batch_size = z.shape[0] * n_candidate_gen_per_text
+                c = torch.cat([c] * n_candidate_gen_per_text, dim=0)
+                text = text * n_candidate_gen_per_text
 
                 if unconditional_guidance_scale != 1.0:
                     unconditional_conditioning = (
                         self.cond_stage_model.get_unconditional_condition(batch_size)
                     )
-
-                fnames = list(super().get_input(batch, "fname"))
 
                 samples, _ = self.sample_log(
                     cond=c,

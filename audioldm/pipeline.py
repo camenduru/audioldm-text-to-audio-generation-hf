@@ -29,7 +29,7 @@ def make_batch_for_text_to_audio(text, batchsize=2):
     )  
     return batch
 
-def text_to_audio(text, batchsize=2, guidance_scale=2.5, n_gen=1, config=None):
+def build_model(config=None):
     if(torch.cuda.is_available()):
         device = torch.device("cuda:0")
     else:
@@ -57,13 +57,16 @@ def text_to_audio(text, batchsize=2, guidance_scale=2.5, n_gen=1, config=None):
     latent_diffusion = latent_diffusion.to(device)
 
     latent_diffusion.cond_stage_model.embed_mode = "text"
+    return latent_diffusion
 
+
+def text_to_audio(latent_diffusion, text, duration=10, batchsize=2, guidance_scale=2.5, n_candidate_gen_per_text=3, config=None):
     batch = make_batch_for_text_to_audio(text, batchsize=batchsize)
-
     with torch.no_grad():
         waveform = latent_diffusion.generate_sample(
             [batch],
             unconditional_guidance_scale=guidance_scale,
-            n_gen=n_gen,
+            n_candidate_gen_per_text=n_candidate_gen_per_text,
+            duration=duration
         )
     return waveform
