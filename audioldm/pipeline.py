@@ -40,8 +40,6 @@ def text_to_audio(text, batchsize=2, guidance_scale=2.5, n_gen=1, config=None):
         config = yaml.load(open(config, "r"), Loader=yaml.FullLoader)
     else:
         config = default_audioldm_config()
-        
-    # config["id"]["version"] = "%s_%s" % (config["id"]["name"], config["id"]["version"])
 
     # Use text as condition instead of using waveform during training
     config["model"]["params"]["device"] = device
@@ -56,7 +54,7 @@ def text_to_audio(text, batchsize=2, guidance_scale=2.5, n_gen=1, config=None):
     latent_diffusion.load_state_dict(checkpoint["state_dict"])
 
     latent_diffusion.eval()
-    latent_diffusion = latent_diffusion.cuda()
+    latent_diffusion = latent_diffusion.to(device)
 
     latent_diffusion.cond_stage_model.embed_mode = "text"
 
