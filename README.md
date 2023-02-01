@@ -1,6 +1,6 @@
 ---
 title: Audioldm Text To Audio Generation
-emoji: 🌍
+emoji: 🔊
 colorFrom: indigo
 colorTo: red
 sdk: gradio
