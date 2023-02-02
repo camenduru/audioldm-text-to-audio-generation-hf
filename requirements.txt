@@ -11,6 +11,7 @@ numpy<=1.23.5
 soundfile
 librosa
 pandas
+# transformers
 torchlibrosa
 transformers
 ftfy

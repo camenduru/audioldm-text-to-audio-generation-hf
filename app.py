@@ -30,7 +30,10 @@ def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=int(n_candidates)) # [bs, 1, samples]
     waveform = [(16000, wave[0]) for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
-    return waveform
+    if(len(waveform) == 1):
+      return waveform[0]
+    else:
+      return waveform
 
 # iface = gr.Interface(fn=text2audio, inputs=[
 #         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
@@ -71,13 +74,14 @@ with iface:
             ############# Input
             textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1)
 
-            with gr.Accordion("Click to change detailed configurations", open=False):
+            with gr.Accordion("Click to modify detailed configurations", open=False):
               seed = gr.Number(value=42, label="Change this value (any integer number) will lead to a different generation result.")
               duration = gr.Slider(2.5, 10, value=5, step=2.5, label="Duration (seconds)")
               guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
-            outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
+            outputs=[gr.Audio(label="Output", type="numpy")]
+            # outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
             
             btn = gr.Button("Submit").style(full_width=True)
         btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=outputs) 
@@ -89,6 +93,6 @@ with iface:
         </div>
         ''')
 
-iface.queue(concurrency_count=2)
+iface.queue(concurrency_count = 2)
 iface.launch(debug=True)
 # iface.launch(debug=True, share=True)

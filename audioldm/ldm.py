@@ -697,18 +697,19 @@ class LatentDiffusion(DDPM):
 
                 waveform = self.mel_spectrogram_to_waveform(mel)
 
-                similarity = self.cond_stage_model.cos_similarity(
-                    torch.FloatTensor(waveform).squeeze(1), text
-                )
+                if(waveform.shape[0] > 1):
+                    similarity = self.cond_stage_model.cos_similarity(
+                        torch.FloatTensor(waveform).squeeze(1), text
+                    )
 
-                best_index = []
-                for i in range(z.shape[0]):
-                    candidates = similarity[i :: z.shape[0]]
-                    max_index = torch.argmax(candidates).item()
-                    best_index.append(i + max_index * z.shape[0])
+                    best_index = []
+                    for i in range(z.shape[0]):
+                        candidates = similarity[i :: z.shape[0]]
+                        max_index = torch.argmax(candidates).item()
+                        best_index.append(i + max_index * z.shape[0])
 
-                waveform = waveform[best_index]
-                # print("Similarity between generated audio and text", similarity)
-                # print("Choose the following indexes:", best_index)
-                    
+                    waveform = waveform[best_index]
+                    # print("Similarity between generated audio and text", similarity)
+                    # print("Choose the following indexes:", best_index)
+                        
         return waveform

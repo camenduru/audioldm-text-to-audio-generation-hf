@@ -12,10 +12,10 @@ from audioldm.utils import default_audioldm_config
 
 import time
 
-def make_batch_for_text_to_audio(text, batchsize=2):
+def make_batch_for_text_to_audio(text, batchsize=1):
     text = [text] * batchsize
-    if batchsize < 2:
-        print("Warning: Batchsize must be at least 2. Batchsize is set to 2.")
+    if batchsize < 1:
+        print("Warning: Batchsize must be at least 1. Batchsize is set to .")
     fbank = torch.zeros((batchsize, 1024, 64))  # Not used, here to keep the code format
     stft = torch.zeros((batchsize, 1024, 512))  # Not used
     waveform = torch.zeros((batchsize, 160000))  # Not used
@@ -63,7 +63,7 @@ def build_model(config=None):
 def duration_to_latent_t_size(duration):
     return int(duration * 25.6) 
 
-def text_to_audio(latent_diffusion, text, seed=42, duration=10, batchsize=2, guidance_scale=2.5, n_candidate_gen_per_text=3, config=None):
+def text_to_audio(latent_diffusion, text, seed=42, duration=10, batchsize=1, guidance_scale=2.5, n_candidate_gen_per_text=3, config=None):
     seed_everything(int(seed))
     batch = make_batch_for_text_to_audio(text, batchsize=batchsize)
     
