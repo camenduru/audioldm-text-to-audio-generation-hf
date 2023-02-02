@@ -1,12 +1,12 @@
 import gradio as gr
 import numpy as np
-from audioldm import text_to_audio, seed_everything, build_model
+from audioldm import text_to_audio, build_model
 
 audioldm = build_model()
 
-def text2audio(text, duration, guidance_scale, random_seed):
+def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     # print(text, length, guidance_scale)
-    waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=1) # [bs, 1, samples]
+    waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=int(n_candidates)) # [bs, 1, samples]
     waveform = [(16000, wave[0]) for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     return waveform
@@ -49,14 +49,15 @@ with iface:
         with gr.Box():
             ############# Input
             textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1)
-            duration = gr.Slider(2.5, 10, value=5, step=2.5)
-            guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5)
-            seed = gr.Number(value=42)
+            seed = gr.Number(value=42, label="Change this value (any integer number) will lead to a different generation result.")
+            duration = gr.Slider(2.5, 10, value=5, step=2.5, label="Duration (seconds)")
+            guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
+            n_candidates = gr.Slider(1, 5, value=1, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
             outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
             
             btn = gr.Button("Submit").style(full_width=True)
-        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed], outputs=outputs) 
+        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=outputs) 
         gr.HTML('''
         <hr>
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
@@ -66,4 +67,5 @@ with iface:
         ''')
 
 iface.queue(concurrency_count=2)
-iface.launch(debug=True, share=True)
+iface.launch(debug=True)
+# iface.launch(debug=True, share=True)
