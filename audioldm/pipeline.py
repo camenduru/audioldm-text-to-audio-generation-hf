@@ -6,8 +6,9 @@ import argparse
 import yaml
 import torch
 
-from audioldm import LatentDiffusion
+from audioldm import LatentDiffusion, seed_everything
 from audioldm.utils import default_audioldm_config
+
 
 import time
 
@@ -18,7 +19,7 @@ def make_batch_for_text_to_audio(text, batchsize=2):
     fbank = torch.zeros((batchsize, 1024, 64))  # Not used, here to keep the code format
     stft = torch.zeros((batchsize, 1024, 512))  # Not used
     waveform = torch.zeros((batchsize, 160000))  # Not used
-    fname = ["%s.wav" % x for x in range(batchsize)]
+    fname = [""] * batchsize # Not used
     batch = (
         fbank,
         stft,
@@ -59,9 +60,14 @@ def build_model(config=None):
     latent_diffusion.cond_stage_model.embed_mode = "text"
     return latent_diffusion
 
+def duration_to_latent_t_size(duration):
+    return int(duration * 25.6) 
 
-def text_to_audio(latent_diffusion, text, duration=10, batchsize=2, guidance_scale=2.5, n_candidate_gen_per_text=3, config=None):
+def text_to_audio(latent_diffusion, text, seed=42, duration=10, batchsize=2, guidance_scale=2.5, n_candidate_gen_per_text=3, config=None):
+    seed_everything(int(seed))
     batch = make_batch_for_text_to_audio(text, batchsize=batchsize)
+    
+    latent_diffusion.latent_t_size = duration_to_latent_t_size(duration)
     with torch.no_grad():
         waveform = latent_diffusion.generate_sample(
             [batch],

@@ -4,17 +4,18 @@ from audioldm import text_to_audio, seed_everything, build_model
 
 audioldm = build_model()
 
-def text2audio(text, duration, guidance_scale):
+def text2audio(text, duration, guidance_scale, random_seed):
     # print(text, length, guidance_scale)
-    waveform = text_to_audio(audioldm, text, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=1) # [bs, 1, samples]
+    waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=1) # [bs, 1, samples]
     waveform = [(16000, wave[0]) for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     return waveform
 
 iface = gr.Interface(fn=text2audio, inputs=[
         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
-        gr.Slider(2, 15, value=5, step=0.1),
+        gr.Slider(2.5, 10, value=5, step=2.5),
         gr.Slider(0, 5, value=2.5, step=0.5),
+        gr.Number(value=42)
     ], outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
                      )
 iface.launch(share=True)

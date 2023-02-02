@@ -659,7 +659,7 @@ class LatentDiffusion(DDPM):
         # os.makedirs(waveform_save_path, exist_ok=True)
         # print("Waveform save path: ", waveform_save_path)
 
-        with self.ema_scope("Plotting"):
+        with self.ema_scope("Generate"):
             for batch in batchs:
                 z, c = self.get_input(
                     batch,
