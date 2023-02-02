@@ -1,6 +1,7 @@
 import gradio as gr
 import numpy as np
 from audioldm import text_to_audio, build_model
+from share_btn import community_icon_html, loading_icon_html, share_js
 # from transformers import AutoModelForCausalLM, AutoTokenizer
 # import torch
 
@@ -31,9 +32,8 @@ def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     waveform = [(16000, wave[0]) for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     if(len(waveform) == 1):
-      return waveform[0]
-    else:
-      return waveform
+      waveform = waveform[0]
+    return waveform # ,gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
 
 # iface = gr.Interface(fn=text2audio, inputs=[
 #         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
@@ -80,19 +80,36 @@ with iface:
               guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
-            outputs=[gr.Audio(label="Output", type="numpy")]
+            outputs=gr.Audio(label="Output", type="numpy")
+            # with gr.Group(elem_id="container-advanced-btns"):
+            #   advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
+            #   with gr.Group(elem_id="share-btn-container"):
+            #     community_icon = gr.HTML(community_icon_html, visible=False)
+            #     loading_icon = gr.HTML(loading_icon_html, visible=False)
+            #     share_button = gr.Button("Share to community", elem_id="share-btn", visible=False)
             # outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
             
             btn = gr.Button("Submit").style(full_width=True)
-        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=outputs) 
+        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])  # , share_button, community_icon, loading_icon
+        # advanced_button.click(None, [], [], _js=share_js)
         gr.HTML('''
         <hr>
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
-                    <p>Model by <a href="https://haoheliu.github.io/" style="text-decoration: underline;" target="_blank">Haohe Liu</a>
+                    <p>Model by <a href="https://twitter.com/LiuHaohe" style="text-decoration: underline;" target="_blank">Haohe Liu</a>
                     </p>
         </div>
         ''')
-
+        
+        with gr.Accordion("Additional information", open=False):
+            gr.HTML(
+            """
+                <div class="acknowledgments">
+                    <p> We build the model with data from <a href="http://research.google.com/audioset/">AudioSet</a>, <a href="https://freesound.org/">Freesound</a> and <a href="https://sound-effects.bbcrewind.co.uk/">BBC Sound Effect library</a>. We share this demo based on the <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/375954/Research.pdf">UK copyright exception</a> of data for academic research. </p>
+                    <p>This demo is strictly for research demo purpose only. For commercial use please <a href="haoheliu@gmail.com">contact us</a>.</p>
+                            </div>
+                        """
+                      )
+            
 iface.queue(concurrency_count = 2)
 iface.launch(debug=True)
 # iface.launch(debug=True, share=True)
