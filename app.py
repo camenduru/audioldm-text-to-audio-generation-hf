@@ -189,6 +189,12 @@ with iface:
             </div>
         """
     )  
+    gr.HTML("""
+<p>For faster inference without waiting in queue, you may duplicate the space and upgrade to GPU in settings.
+<br/>
+<a href="https://huggingface.co/spaces/haoheliu/audioldm-text-to-audio-generation?duplicate=true">
+<img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>
+<p/>""")
     with gr.Group():
         with gr.Box():
             ############# Input
