@@ -179,7 +179,7 @@ with iface:
                   font-size: 1.75rem;
                 "
               >
-                <h1 style="font-weight: 900; margin-bottom: 7px;">
+                <h1 style="font-weight: 900; margin-bottom: 7px; line-height: normal;">
                   AudioLDM: Text-to-Audio Generation with Latent Diffusion Models
                 </h1>
               </div>
