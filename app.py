@@ -2,11 +2,8 @@ import gradio as gr
 import numpy as np
 from audioldm import text_to_audio, build_model
 from share_btn import community_icon_html, loading_icon_html, share_js
-# from transformers import AutoModelForCausalLM, AutoTokenizer
-# import torch
 
-# tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-# model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+model_id="haoheliu/AudioLDM-S-Full"
 
 audioldm = build_model()
 # audioldm=None
