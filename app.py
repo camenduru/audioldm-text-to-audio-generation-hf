@@ -215,10 +215,12 @@ with iface:
         btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])  # , share_button, community_icon, loading_icon
         # share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
-        <hr>
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
-                    <p>Model by <a href="https://twitter.com/LiuHaohe" style="text-decoration: underline;" target="_blank">Haohe Liu</a>
+                    <p>Follow the latest update of AudioLDM on our<a href="https://github.com/haoheliu/AudioLDM" style="text-decoration: underline;" target="_blank"> Github repo</a>
                     </p>
+                    <br>
+                    <p>Model by <a href="https://twitter.com/LiuHaohe" style="text-decoration: underline;" target="_blank">Haohe Liu</a></p>
+                    <br>
         </div>
         ''')
         
