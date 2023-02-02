@@ -51,7 +51,7 @@ def build_model(config=None):
 
     resume_from_checkpoint = "./ckpt/ldm_trimmed.ckpt"
 
-    checkpoint = torch.load(resume_from_checkpoint)
+    checkpoint = torch.load(resume_from_checkpoint, map_location=device)
     latent_diffusion.load_state_dict(checkpoint["state_dict"])
 
     latent_diffusion.eval()
