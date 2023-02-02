@@ -29,11 +29,11 @@ audioldm = build_model()
 def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     # print(text, length, guidance_scale)
     waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=int(n_candidates)) # [bs, 1, samples]
-    waveform = [(16000, wave[0]) for wave in waveform]
+    waveform = [gr.make_waveform((16000, wave[0])) for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     if(len(waveform) == 1):
       waveform = waveform[0]
-    return waveform # ,gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
+    return waveform,gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
 
 # iface = gr.Interface(fn=text2audio, inputs=[
 #         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
@@ -45,7 +45,130 @@ def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
 #                      )
 # iface.launch(share=True)
 
-iface = gr.Blocks()
+css = """
+        .gradio-container {
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+        .gr-button {
+            color: white;
+            border-color: black;
+            background: black;
+        }
+        input[type='range'] {
+            accent-color: black;
+        }
+        .dark input[type='range'] {
+            accent-color: #dfdfdf;
+        }
+        .container {
+            max-width: 730px;
+            margin: auto;
+            padding-top: 1.5rem;
+        }
+        #gallery {
+            min-height: 22rem;
+            margin-bottom: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            border-bottom-right-radius: .5rem !important;
+            border-bottom-left-radius: .5rem !important;
+        }
+        #gallery>div>.h-full {
+            min-height: 20rem;
+        }
+        .details:hover {
+            text-decoration: underline;
+        }
+        .gr-button {
+            white-space: nowrap;
+        }
+        .gr-button:focus {
+            border-color: rgb(147 197 253 / var(--tw-border-opacity));
+            outline: none;
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            --tw-border-opacity: 1;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px var(--tw-ring-offset-width)) var(--tw-ring-color);
+            --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity));
+            --tw-ring-opacity: .5;
+        }
+        #advanced-btn {
+            font-size: .7rem !important;
+            line-height: 19px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            padding: 2px 8px;
+            border-radius: 14px !important;
+        }
+        #advanced-options {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .footer {
+            margin-bottom: 45px;
+            margin-top: 35px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .footer>p {
+            font-size: .8rem;
+            display: inline-block;
+            padding: 0 10px;
+            transform: translateY(10px);
+            background: white;
+        }
+        .dark .footer {
+            border-color: #303030;
+        }
+        .dark .footer>p {
+            background: #0b0f19;
+        }
+        .acknowledgments h4{
+            margin: 1.25em 0 .25em 0;
+            font-weight: bold;
+            font-size: 115%;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        #share-btn-container {
+            display: flex; padding-left: 0.5rem !important; padding-right: 0.5rem !important; background-color: #000000; justify-content: center; align-items: center; border-radius: 9999px !important; width: 13rem;
+            margin-top: 10px;
+            margin-left: auto;
+        }
+        #share-btn {
+            all: initial; color: #ffffff;font-weight: 600; cursor:pointer; font-family: 'IBM Plex Sans', sans-serif; margin-left: 0.5rem !important; padding-top: 0.25rem !important; padding-bottom: 0.25rem !important;right:0;
+        }
+        #share-btn * {
+            all: unset;
+        }
+        #share-btn-container div:nth-child(-n+2){
+            width: auto !important;
+            min-height: 0px !important;
+        }
+        #share-btn-container .wrap {
+            display: none !important;
+        }
+        
+        .gr-form{
+            flex: 1 1 50%; border-top-right-radius: 0; border-bottom-right-radius: 0;
+        }
+        #prompt-container{
+            gap: 0;
+        }
+        #prompt-text-input, #negative-prompt-text-input{padding: .45rem 0.625rem}
+        #component-16{border-top-width: 1px!important;margin-top: 1em}
+        .image_duplication{position: absolute; width: 100px; left: 50px}
+"""
+iface = gr.Blocks(css=css)
 
 with iface:
     gr.HTML(
@@ -60,7 +183,7 @@ with iface:
                 "
               >
                 <h1 style="font-weight: 900; margin-bottom: 7px;">
-                  Text-to-Audio Generation with AudioLDM
+                  AudioLDM: Text-to-Audio Generation with Latent Diffusion Models
                 </h1>
               </div>
               <p style="margin-bottom: 10px; font-size: 94%">
@@ -72,7 +195,7 @@ with iface:
     with gr.Group():
         with gr.Box():
             ############# Input
-            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1)
+            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Please ensure it is descriptive and of moderate length.")
 
             with gr.Accordion("Click to modify detailed configurations", open=False):
               seed = gr.Number(value=42, label="Change this value (any integer number) will lead to a different generation result.")
@@ -80,18 +203,19 @@ with iface:
               guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
-            outputs=gr.Audio(label="Output", type="numpy")
-            # with gr.Group(elem_id="container-advanced-btns"):
-            #   advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
-            #   with gr.Group(elem_id="share-btn-container"):
-            #     community_icon = gr.HTML(community_icon_html, visible=False)
-            #     loading_icon = gr.HTML(loading_icon_html, visible=False)
-            #     share_button = gr.Button("Share to community", elem_id="share-btn", visible=False)
+            # outputs=gr.Audio(label="Output", type="numpy")
+            outputs=gr.Video(label="Output")
+            with gr.Group(elem_id="container-advanced-btns"):
+              # advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
+              with gr.Group(elem_id="share-btn-container"):
+                community_icon = gr.HTML(community_icon_html, visible=False)
+                loading_icon = gr.HTML(loading_icon_html, visible=False)
+                share_button = gr.Button("Share to community", elem_id="share-btn", visible=False)
             # outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
             
             btn = gr.Button("Submit").style(full_width=True)
-        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])  # , share_button, community_icon, loading_icon
-        # advanced_button.click(None, [], [], _js=share_js)
+        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs, community_icon, loading_icon, share_button])  # , share_button, community_icon, loading_icon
+        share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
         <hr>
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
