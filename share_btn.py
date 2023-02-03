@@ -22,34 +22,48 @@ share_js = """async () => {
 		const url = await response.text();
 		return url;
 	}
-    const gradioEl = document.querySelector('body > gradio-app');
-    const imgEls = gradioEl.querySelectorAll('#gallery img');
-    const promptTxt = gradioEl.querySelector('#prompt-text-input input').value;
+    async function getInputVideoFile(videoEl){
+        const res = await fetch(videoEl.src);
+        const blob = await res.blob();
+        const videoId = Date.now() % 200;
+        const fileName = `sd-perception-${{videoId}}.mp4`;
+        return new File([blob], fileName, { type: 'video/mp4' }); 
+	}
+    
+    async function audioToBase64(audioFile) {
+        return new Promise((resolve, reject) => {
+            let reader = new FileReader();
+            reader.readAsDataURL(audioFile);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+          
+        });
+      }
+    const gradioEl = document.querySelector("gradio-app").shadowRoot || document.querySelector('body > gradio-app');
+    const inputPromptEl = gradioEl.querySelector('#prompt-in input').value;
+    const outputVideoEl = gradioEl.querySelector('#output-video video');
+    
+    let titleTxt = `Text-to-Audio: ${inputPromptEl}`;
+
     const shareBtnEl = gradioEl.querySelector('#share-btn');
     const shareIconEl = gradioEl.querySelector('#share-btn-share-icon');
     const loadingIconEl = gradioEl.querySelector('#share-btn-loading-icon');
-    if(!imgEls.length){
+    if(!outputVideoEl){
         return;
     };
     shareBtnEl.style.pointerEvents = 'none';
     shareIconEl.style.display = 'none';
     loadingIconEl.style.removeProperty('display');
-    const files = await Promise.all(
-        [...imgEls].map(async (imgEl) => {
-            const res = await fetch(imgEl.src);
-            const blob = await res.blob();
-            const imgId = Date.now() % 200;
-            const fileName = `diffuse-the-rest-${{imgId}}.jpg`;
-            return new File([blob], fileName, { type: 'image/jpeg' });
-        })
-    );
-    const urls = await Promise.all(files.map((f) => uploadFile(f)));
-	const htmlImgs = urls.map(url => `<img src='${url}' width='400' height='400'>`);
-	const descriptionMd = `<div style='display: flex; flex-wrap: wrap; column-gap: 0.75rem;'>
-${htmlImgs.join(`\n`)}
-</div>`;
+    const outputVideo = await getInputVideoFile(outputVideoEl);
+    const urlOutputVideo = await uploadFile(outputVideo);
+    
+    const descriptionMd = `
+##### ${inputPromptEl}
+    
+${urlOutputVideo}
+`;
     const params = new URLSearchParams({
-        title: promptTxt,
+        title: titleTxt,
         description: descriptionMd,
     });
 	const paramsStr = params.toString();

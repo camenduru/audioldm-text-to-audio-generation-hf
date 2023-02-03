@@ -30,7 +30,7 @@ def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     if(len(waveform) == 1):
       waveform = waveform[0]
-    return waveform # ,gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
+    return waveform
 
 # iface = gr.Interface(fn=text2audio, inputs=[
 #         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
@@ -42,17 +42,22 @@ def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
 #                      )
 # iface.launch(share=True)
 
+
 css = """
+        a {
+            color: inherit;
+            text-decoration: underline;
+        }
         .gradio-container {
             font-family: 'IBM Plex Sans', sans-serif;
         }
         .gr-button {
             color: white;
-            border-color: black;
-            background: black;
+            border-color: #000000;
+            background: #000000;
         }
         input[type='range'] {
-            accent-color: black;
+            accent-color: #000000;
         }
         .dark input[type='range'] {
             accent-color: #dfdfdf;
@@ -98,7 +103,6 @@ css = """
             border-radius: 14px !important;
         }
         #advanced-options {
-            display: none;
             margin-bottom: 20px;
         }
         .footer {
@@ -124,6 +128,12 @@ css = """
             margin: 1.25em 0 .25em 0;
             font-weight: bold;
             font-size: 115%;
+        }
+        #container-advanced-btns{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
         }
         .animate-spin {
             animation: spin 1s linear infinite;
@@ -154,16 +164,20 @@ css = """
         #share-btn-container .wrap {
             display: none !important;
         }
-        
         .gr-form{
             flex: 1 1 50%; border-top-right-radius: 0; border-bottom-right-radius: 0;
         }
         #prompt-container{
             gap: 0;
         }
-        #prompt-text-input, #negative-prompt-text-input{padding: .45rem 0.625rem}
-        #component-16{border-top-width: 1px!important;margin-top: 1em}
-        .image_duplication{position: absolute; width: 100px; left: 50px}
+        #generated_id{
+            min-height: 700px
+        }
+        #setting_id{
+          margin-bottom: 12px;
+          text-align: center;
+          font-weight: 900;
+        }
 """
 iface = gr.Blocks(css=css)
 
@@ -188,17 +202,21 @@ with iface:
               </p>
             </div>
         """
-    )  
+    )
     gr.HTML("""
-<p>For faster inference without waiting in queue, you may duplicate the space and upgrade to GPU in settings.
-<br/>
-<a href="https://huggingface.co/spaces/haoheliu/audioldm-text-to-audio-generation?duplicate=true">
-<img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>
-<p/>""")
+        <h1 style="font-weight: 900; margin-bottom: 7px;">
+        AudioLDM: Text-to-Audio Generation with Latent Diffusion Models
+        </h1>
+        <p>For faster inference without waiting in queue, you may duplicate the space and upgrade to GPU in settings.
+        <br/>
+        <a href="https://huggingface.co/spaces/haoheliu/audioldm-text-to-audio-generation?duplicate=true">
+        <img style="margin-top: 0em; margin-bottom: 0em" src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>
+        <p/>
+    """)
     with gr.Group():
         with gr.Box():
             ############# Input
-            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Please ensure it is descriptive and of moderate length.")
+            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Please ensure it is descriptive and of moderate length.", elem_id="prompt-in")
 
             with gr.Accordion("Click to modify detailed configurations", open=False):
               seed = gr.Number(value=42, label="Change this value (any integer number) will lead to a different generation result.")
@@ -207,7 +225,7 @@ with iface:
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
             # outputs=gr.Audio(label="Output", type="numpy")
-            outputs=gr.Video(label="Output")
+            outputs=gr.Video(label="Output", elem_id="output-video")
             
             # with gr.Group(elem_id="container-advanced-btns"):
             #   # advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
@@ -216,10 +234,17 @@ with iface:
             #     loading_icon = gr.HTML(loading_icon_html, visible=False)
             #     share_button = gr.Button("Share to community", elem_id="share-btn", visible=False)
             # outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
-            
             btn = gr.Button("Submit").style(full_width=True)
-        btn.click(text2audio, inputs=[textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])  # , share_button, community_icon, loading_icon
-        # share_button.click(None, [], [], _js=share_js)
+
+        with gr.Group(elem_id="share-btn-container", visible=False) as share_group:
+            community_icon = gr.HTML(community_icon_html)
+            loading_icon = gr.HTML(loading_icon_html)
+            share_button = gr.Button("Share to community", elem_id="share-btn")
+
+        btn.click(text2audio, inputs=[
+                  textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs, share_group])
+
+        share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
                     <p>Follow the latest update of AudioLDM on our<a href="https://github.com/haoheliu/AudioLDM" style="text-decoration: underline;" target="_blank"> Github repo</a>
@@ -229,17 +254,28 @@ with iface:
                     <br>
         </div>
         ''')
-        
+        gr.Examples([
+            ["A hammer is hitting a wooden surface", 5, 2.5, 45, 3],
+            ["Peaceful and calming ambient music with singing bowl and other instruments.", 5, 2.5, 45, 3],
+            ["A man is speaking in a small room.", 5, 2.5, 45, 3],
+            ["A female is speaking followed by footstep sound", 5, 2.5, 45, 3],
+            ["Wooden table tapping sound followed by water pouring sound.", 5, 2.5, 45, 3],
+        ],
+            fn=text2audio,
+            inputs=[textbox, duration, guidance_scale, seed, n_candidates],
+            outputs=[outputs],
+            cache_examples=True,
+        )
         with gr.Accordion("Additional information", open=False):
             gr.HTML(
-            """
+                """
                 <div class="acknowledgments">
                     <p> We build the model with data from <a href="http://research.google.com/audioset/">AudioSet</a>, <a href="https://freesound.org/">Freesound</a> and <a href="https://sound-effects.bbcrewind.co.uk/">BBC Sound Effect library</a>. We share this demo based on the <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/375954/Research.pdf">UK copyright exception</a> of data for academic research. </p>
                             </div>
                         """
-                      )
+            )
 # <p>This demo is strictly for research demo purpose only. For commercial use please <a href="haoheliu@gmail.com">contact us</a>.</p>
-            
-iface.queue(concurrency_count = 3)
+
+iface.queue(concurrency_count=3)
 iface.launch(debug=True)
 # iface.launch(debug=True, share=True)
