@@ -26,7 +26,7 @@ audioldm = build_model()
 def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     # print(text, length, guidance_scale)
     waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=int(n_candidates)) # [bs, 1, samples]
-    waveform = [gr.make_waveform((16000, wave[0])) for wave in waveform]
+    waveform = [gr.make_waveform((16000, wave[0]), bg_image="bg.png") for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     if(len(waveform) == 1):
       waveform = waveform[0]
