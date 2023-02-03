@@ -236,13 +236,13 @@ with iface:
             # outputs=[gr.Audio(label="Output", type="numpy"), gr.Audio(label="Output", type="numpy")]
             btn = gr.Button("Submit").style(full_width=True)
 
-        with gr.Group(elem_id="share-btn-container", visible=False) as share_group:
+        with gr.Group(elem_id="share-btn-container", visible=False):
             community_icon = gr.HTML(community_icon_html)
             loading_icon = gr.HTML(loading_icon_html)
             share_button = gr.Button("Share to community", elem_id="share-btn")
 
         btn.click(text2audio, inputs=[
-                  textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs, share_group])
+                  textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])
 
         share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
