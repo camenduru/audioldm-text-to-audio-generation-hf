@@ -219,7 +219,7 @@ with iface:
             textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Please ensure it is descriptive and of moderate length.", elem_id="prompt-in")
 
             with gr.Accordion("Click to modify detailed configurations", open=False):
-              seed = gr.Number(value=42, label="Change this value (any integer number) will lead to a different generation result.")
+              seed = gr.Number(value=45, label="Change this value (any integer number) will lead to a different generation result.")
               duration = gr.Slider(2.5, 10, value=5, step=2.5, label="Duration (seconds)")
               guidance_scale = gr.Slider(0, 5, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
