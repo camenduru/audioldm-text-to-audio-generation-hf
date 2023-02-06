@@ -254,6 +254,14 @@ with iface:
                     <br>
         </div>
         ''')
+        gr.HTML('''
+                <div class="acknowledgements">
+                <p>Essential Tricks for Enhancing the Quality of Your Generated Audio</p>
+                <p>1. Try to use more adjectives to describe your sound. For example: "A man is speaking clearly and slowly" is better than "A man is speaking".</p>
+                <p>2. Try to use different random seeds, which can affect the generation quality significantly sometimes.</p>
+                <p>3. It's better to use general terms like 'man' or 'woman' instead of specific names for individuals or abstract objects that humans may not be familiar with, such as 'mummy'.</p>
+                </div>
+                ''')
         gr.Examples([
             ["A hammer is hitting a wooden surface", 5, 2.5, 45, 3],
             ["Peaceful and calming ambient music with singing bowl and other instruments.", 5, 2.5, 45, 3],
