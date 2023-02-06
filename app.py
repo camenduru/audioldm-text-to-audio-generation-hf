@@ -216,7 +216,7 @@ with iface:
     with gr.Group():
         with gr.Box():
             ############# Input
-            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Please ensure it is descriptive and of moderate length.", elem_id="prompt-in")
+            textbox = gr.Textbox(value="A hammer is hitting a wooden surface", max_lines=1, label="Input your text here. Your text is important for the audio quality. Please ensure it is descriptive by using more adjectives.", elem_id="prompt-in")
 
             with gr.Accordion("Click to modify detailed configurations", open=False):
               seed = gr.Number(value=45, label="Change this value (any integer number) will lead to a different generation result.")
