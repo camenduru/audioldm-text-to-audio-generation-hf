@@ -226,7 +226,7 @@ with iface:
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
             # outputs=gr.Audio(label="Output", type="numpy")
-            outputs=gr.Video(label="Output", elem_id="output-video"), gr.Audio(visible=False)
+            outputs=[gr.Video(label="Output", elem_id="output-video"), gr.Audio(visible=False)]
             
             # with gr.Group(elem_id="container-advanced-btns"):
             #   # advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
