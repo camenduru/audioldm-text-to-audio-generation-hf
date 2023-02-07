@@ -26,11 +26,12 @@ audioldm = build_model()
 def text2audio(text, duration, guidance_scale, random_seed, n_candidates):
     # print(text, length, guidance_scale)
     waveform = text_to_audio(audioldm, text, random_seed, duration=duration, guidance_scale=guidance_scale, n_candidate_gen_per_text=int(n_candidates)) # [bs, 1, samples]
+    audio_out = waveform
     waveform = [gr.make_waveform((16000, wave[0]), bg_image="bg.png") for wave in waveform]
     # waveform = [(16000, np.random.randn(16000)), (16000, np.random.randn(16000))]
     if(len(waveform) == 1):
       waveform = waveform[0]
-    return waveform
+    return waveform, audio_out
 
 # iface = gr.Interface(fn=text2audio, inputs=[
 #         gr.Textbox(value="A man is speaking in a huge room", max_lines=1),
@@ -225,7 +226,7 @@ with iface:
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
             ############# Output
             # outputs=gr.Audio(label="Output", type="numpy")
-            outputs=gr.Video(label="Output", elem_id="output-video")
+            outputs=gr.Video(label="Output", elem_id="output-video"), gr.Audio(visible=False)
             
             # with gr.Group(elem_id="container-advanced-btns"):
             #   # advanced_button = gr.Button("Advanced options", elem_id="advanced-btn")
