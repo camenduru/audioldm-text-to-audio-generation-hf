@@ -243,7 +243,7 @@ with iface:
             share_button = gr.Button("Share to community", elem_id="share-btn")
 
         btn.click(text2audio, inputs=[
-                  textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])
+                  textbox, duration, guidance_scale, seed, n_candidates], outputs=outputs)
 
         share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
