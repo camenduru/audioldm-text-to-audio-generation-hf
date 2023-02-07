@@ -264,7 +264,7 @@ with iface:
         ],
             fn=text2audio,
             inputs=[textbox, duration, guidance_scale, seed, n_candidates],
-            outputs=[outputs],
+            outputs=outputs,
             cache_examples=True,
         )
         gr.HTML('''
