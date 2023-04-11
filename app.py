@@ -23,7 +23,7 @@ current_model_name = None
 #     response = [(response[i], response[i+1]) for i in range(0, len(response)-1, 2)]  # convert to tuples of list
 #     return response, history
   
-def text2audio(text, duration, guidance_scale, random_seed, n_candidates, model_name):
+def text2audio(text, duration, guidance_scale, random_seed, n_candidates, model_name="audioldm-m-text-ft"):
     global audioldm, current_model_name
     
     if audioldm is None or model_name != current_model_name:
@@ -238,9 +238,9 @@ with iface:
               duration = gr.Slider(2.5, 10, value=10, step=2.5, label="Duration (seconds)")
               guidance_scale = gr.Slider(0, 4, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
-              model_name = gr.Dropdown(
-                    ["audioldm-m-text-ft", "audioldm-s-text-ft", "audioldm-m-full","audioldm-s-full-v2", "audioldm-s-full", "audioldm-l-full"], value="audioldm-m-text-ft", label="Choose the model to use. audioldm-m-text-ft and audioldm-s-text-ft are recommanded. -s- means small, -m- means medium and -l- means large",
-                )
+              # model_name = gr.Dropdown(
+              #       ["audioldm-m-text-ft", "audioldm-s-text-ft", "audioldm-m-full","audioldm-s-full-v2", "audioldm-s-full", "audioldm-l-full"], value="audioldm-m-text-ft", label="Choose the model to use. audioldm-m-text-ft and audioldm-s-text-ft are recommanded. -s- means small, -m- means medium and -l- means large",
+              #   )
             ############# Output
             # outputs=gr.Audio(label="Output", type="numpy")
             outputs=gr.Video(label="Output", elem_id="output-video")
@@ -259,9 +259,11 @@ with iface:
             loading_icon = gr.HTML(loading_icon_html)
             share_button = gr.Button("Share to community", elem_id="share-btn")
 
+        # btn.click(text2audio, inputs=[
+        #           textbox, duration, guidance_scale, seed, n_candidates, model_name], outputs=[outputs])
         btn.click(text2audio, inputs=[
-                  textbox, duration, guidance_scale, seed, n_candidates, model_name], outputs=[outputs])
-
+                  textbox, duration, guidance_scale, seed, n_candidates], outputs=[outputs])
+        
         share_button.click(None, [], [], _js=share_js)
         gr.HTML('''
         <div class="footer" style="text-align: center; max-width: 700px; margin: 0 auto;">
@@ -280,7 +282,8 @@ with iface:
             ["Wooden table tapping sound followed by water pouring sound.", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
         ],
             fn=text2audio,
-            inputs=[textbox, duration, guidance_scale, seed, n_candidates, model_name],
+            # inputs=[textbox, duration, guidance_scale, seed, n_candidates, model_name],
+            inputs=[textbox, duration, guidance_scale, seed, n_candidates],
             outputs=[outputs],
             cache_examples=True,
         )
