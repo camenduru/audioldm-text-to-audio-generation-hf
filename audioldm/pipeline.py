@@ -30,7 +30,23 @@ def make_batch_for_text_to_audio(text, batchsize=1):
     )  
     return batch
 
-def build_model(config=None):
+
+
+def build_model(
+    ckpt_path=None,
+    config=None,
+    model_name="audioldm-s-full"
+):
+    print("Load AudioLDM: %s" % model_name)
+    
+    resume_from_checkpoint = "ckpt/%s.ckpt" % model_name
+    
+    # if(ckpt_path is None):
+    #     ckpt_path = get_metadata()[model_name]["path"]
+    
+    # if(not os.path.exists(ckpt_path)):
+    #     download_checkpoint(model_name)
+        
     if(torch.cuda.is_available()):
         device = torch.device("cuda:0")
     else:
@@ -40,7 +56,7 @@ def build_model(config=None):
         assert type(config) is str
         config = yaml.load(open(config, "r"), Loader=yaml.FullLoader)
     else:
-        config = default_audioldm_config()
+        config = default_audioldm_config(model_name)
 
     # Use text as condition instead of using waveform during training
     config["model"]["params"]["device"] = device
@@ -48,8 +64,6 @@ def build_model(config=None):
 
     # No normalization here
     latent_diffusion = LatentDiffusion(**config["model"]["params"])
-
-    resume_from_checkpoint = "./ckpt/ldm_trimmed.ckpt"
 
     checkpoint = torch.load(resume_from_checkpoint, map_location=device)
     latent_diffusion.load_state_dict(checkpoint["state_dict"])
