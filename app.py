@@ -239,7 +239,7 @@ with iface:
               guidance_scale = gr.Slider(0, 4, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
               n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
               # model_name = gr.Dropdown(
-              #       ["audioldm-m-text-ft", "audioldm-s-text-ft", "audioldm-m-full","audioldm-s-full-v2", "audioldm-s-full", "audioldm-l-full"], value="audioldm-m-text-ft", label="Choose the model to use. audioldm-m-text-ft and audioldm-s-text-ft are recommanded. -s- means small, -m- means medium and -l- means large",
+              #       ["audioldm-m-text-ft", "audioldm-s-text-ft", "audioldm-m-full","audioldm-s-full-v2", "audioldm-s-full", "audioldm-l-full"], value="audioldm-m-full", label="Choose the model to use. audioldm-m-text-ft and audioldm-s-text-ft are recommanded. -s- means small, -m- means medium and -l- means large",
               #   )
             ############# Output
             # outputs=gr.Audio(label="Output", type="numpy")
@@ -275,11 +275,11 @@ with iface:
         </div>
         ''')
         gr.Examples([
-            ["A hammer is hitting a wooden surface", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
-            ["Peaceful and calming ambient music with singing bowl and other instruments.", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
-            ["A man is speaking in a small room.", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
-            ["A female is speaking followed by footstep sound", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
-            ["Wooden table tapping sound followed by water pouring sound.", 5, 2.5, 45, 3, "audioldm-m-text-ft"],
+            ["A hammer is hitting a wooden surface", 5, 2.5, 45, 3, "audioldm-m-full"],
+            ["Peaceful and calming ambient music with singing bowl and other instruments.", 5, 2.5, 45, 3, "audioldm-m-full"],
+            ["A man is speaking in a small room.", 5, 2.5, 45, 3, "audioldm-m-full"],
+            ["A female is speaking followed by footstep sound", 5, 2.5, 45, 3, "audioldm-m-full"],
+            ["Wooden table tapping sound followed by water pouring sound.", 5, 2.5, 45, 3, "audioldm-m-full"],
         ],
             fn=text2audio,
             # inputs=[textbox, duration, guidance_scale, seed, n_candidates, model_name],
