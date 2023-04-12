@@ -235,9 +235,9 @@ with iface:
 
             with gr.Accordion("Click to modify detailed configurations", open=False):
               seed = gr.Number(value=45, label="Change this value (any integer number) will lead to a different generation result.")
-              duration = gr.Slider(2.5, 10, value=10, step=2.5, label="Duration (seconds)")
+              duration = gr.Slider(2.5, 10, value=5, step=2.5, label="Duration (seconds)")
               guidance_scale = gr.Slider(0, 4, value=2.5, step=0.5, label="Guidance scale (Large => better quality and relavancy to text; Small => better diversity)")
-              n_candidates = gr.Slider(1, 5, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
+              n_candidates = gr.Slider(1, 3, value=3, step=1, label="Automatic quality control. This number control the number of candidates (e.g., generate three audios and choose the best to show you). A Larger value usually lead to better quality with heavier computation")
               # model_name = gr.Dropdown(
               #       ["audioldm-m-text-ft", "audioldm-s-text-ft", "audioldm-m-full","audioldm-s-full-v2", "audioldm-s-full", "audioldm-l-full"], value="audioldm-m-full", label="Choose the model to use. audioldm-m-text-ft and audioldm-s-text-ft are recommanded. -s- means small, -m- means medium and -l- means large",
               #   )
