@@ -8,6 +8,7 @@ sdk_version: 3.27.0
 app_file: app.py
 pinned: false
 license: bigscience-openrail-m
+duplicated_from: haoheliu/audioldm-text-to-audio-generation
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
