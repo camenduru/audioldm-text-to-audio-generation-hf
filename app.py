@@ -34,6 +34,7 @@ def text2audio(text, negative_prompt, duration, guidance_scale, random_seed, n_c
         text,
         audio_length_in_s=duration,
         guidance_scale=guidance_scale,
+        num_inference_steps=100,
         negative_prompt=negative_prompt,
         num_waveforms_per_prompt=n_candidates if n_candidates else 1,
         generator=generator.manual_seed(int(random_seed)),
